@@ -1,5 +1,4 @@
 // src/hooks/useWorkouts.ts
-
 import { useState, useEffect } from 'react';
 import { loadFromLocalStorage, saveToLocalStorage } from '../utils/localStorageUtil';
 import { Workout, Exercise } from '../types/types';
