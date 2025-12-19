@@ -29,6 +29,7 @@ git commit -m "Initial commit"
 ## Step 4: Create GitHub Repository
 
 1. Go to [github.com](https://github.com) and create a new repository
+
    - Name it: `fitbyte` (or whatever you prefer)
    - Make it public (GitHub Pages free tier requires public repos, or upgrade to use private)
    - Don't initialize with README (if you already have code)
@@ -52,6 +53,7 @@ npm run deploy
 ```
 
 This will:
+
 - Build your React app
 - Create a `gh-pages` branch
 - Push it to GitHub
@@ -97,4 +99,3 @@ That's it! Your app will be live on GitHub Pages.
 - **Build fails**: Make sure all dependencies are installed: `npm install` in the client folder
 
 - **Site shows blank page**: Check browser console for errors. Make sure Supabase URL and keys are correct.
-

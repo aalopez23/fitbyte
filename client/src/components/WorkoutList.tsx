@@ -5,6 +5,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import * as supabaseService from '../services/supabaseService';
 
 interface WorkoutListProps {
   workouts: Workout[];
@@ -147,18 +149,47 @@ const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, deleteWorkout, addW
                   <Typography variant="h5" sx={{ fontWeight: 600, color: '#333' }}>
                     {workout.name}
                   </Typography>
-                  <IconButton
-                    onClick={() => deleteWorkout(index)}
-                    sx={{
-                      color: '#ff6b6b',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
-                      },
-                    }}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<CheckCircleIcon />}
+                      onClick={async () => {
+                        if ((workout as any).id) {
+                          try {
+                            await supabaseService.logWorkout((workout as any).id);
+                            alert('Workout logged successfully!');
+                          } catch (error: any) {
+                            console.error('Error logging workout:', error);
+                            alert('Failed to log workout');
+                          }
+                        }
+                      }}
+                      sx={{
+                        textTransform: 'none',
+                        borderColor: '#4caf50',
+                        color: '#4caf50',
+                        '&:hover': {
+                          borderColor: '#388e3c',
+                          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        },
+                      }}
+                    >
+                      Log Workout
+                    </Button>
+                    <IconButton
+                      onClick={() => deleteWorkout(index)}
+                      sx={{
+                        color: '#ff6b6b',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        },
+                      }}
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
 
                 {/* Grouped Exercises */}

@@ -1,5 +1,21 @@
 import React, { ChangeEvent } from 'react';
-import { Exercise } from '../types/types'
+import { Exercise } from '../types/types';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Chip,
+  IconButton,
+  Grid,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface WorkoutInputProps {
   workoutName: string;
@@ -25,8 +41,9 @@ interface WorkoutInputProps {
   addExercise: () => void;
   deleteExercise: (value: number) => void;
   currentExercises: Exercise[];
-  addWorkout: () => void;
+  addWorkout: () => Promise<boolean> | void;
   deleteWorkout: (index: number) => void;
+  onClose?: () => void;
 }
 
 const WorkoutInput: React.FC<WorkoutInputProps> = ({
@@ -54,6 +71,7 @@ const WorkoutInput: React.FC<WorkoutInputProps> = ({
   deleteExercise,
   currentExercises,
   addWorkout,
+  onClose,
 }) => {
   const handleWorkoutNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setWorkoutName(e.target.value);
@@ -63,201 +81,286 @@ const WorkoutInput: React.FC<WorkoutInputProps> = ({
     setExerciseName(e.target.value);
   };
 
-
-  const handleRepsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setReps(Number(e.target.value));
+  const handleAddExercise = () => {
+    addExercise();
   };
 
-  const handleWeightChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setWeight(Number(e.target.value));
+  const handleAddWorkout = async () => {
+    const result = await addWorkout();
+    if (result !== false && onClose) {
+      onClose();
+    }
   };
 
-  const handleDistanceChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDistance(Number(e.target.value));
-  };
-
-  const handleDurationChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDuration(Number(e.target.value));
-  };
-
-  const handleSpeedChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSpeed(Number(e.target.value));
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'strength':
+        return '#ff6b6b';
+      case 'cardio':
+        return '#4ecdc4';
+      case 'mindbody':
+        return '#95e1d3';
+      default:
+        return '#95a5a6';
+    }
   };
 
   return (
-    <div>
-      <h2>Workout Name:</h2>
-      <input
-        type="text"
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>
+          Create New Workout
+        </Typography>
+        {onClose && (
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        )}
+      </Box>
+
+      <TextField
+        fullWidth
+        label="Workout Name"
         value={workoutName}
         onChange={handleWorkoutNameChange}
-        placeholder="Workout Name"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-      />
-      <h3>Add Exercises</h3>
-      <label htmlFor="selectType">Select Category</label>
-      <select id="selectType" aria-label="category" onChange={(e) => setExerciseType(e.target.value)} 
-              style={{display: 'block', width: '70%', padding: '8px', marginBottom: '10px'}}>
-        <option value="strength">Strength Training</option>
-        <option value="cardio">Cardio</option>
-        <option value="mindbody">Mind/Body</option>
-      </select>
-
-      <input
-        type="text"
-        value={exerciseName}
-        onChange={handleExerciseNameChange}
-        placeholder="Exercise Name"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px'}}
+        placeholder="e.g., Upper Body Strength"
+        sx={{ mb: 3 }}
+        required
       />
 
-      {exerciseType === "strength" && (
-      <>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+        Add Exercises
+      </Typography>
 
-      <input
-        type="number"
-        value={sets === 0 ? "" : sets} // if 0 show nothing
-        onChange={(e) => setSets(e.target.value === "" ? 0 : Number(e.target.value))} // empty to 0
-        placeholder="Sets"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-      />
-          
-      <input
-        type="number"
-        value={reps === 0 ? "" : reps} // if 0 show nothing
-        onChange={handleRepsChange}
-        placeholder="Reps"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth>
+            <InputLabel>Exercise Type</InputLabel>
+            <Select
+              value={exerciseType}
+              onChange={(e) => setExerciseType(e.target.value)}
+              label="Exercise Type"
+            >
+              <MenuItem value="strength">Strength Training</MenuItem>
+              <MenuItem value="cardio">Cardio</MenuItem>
+              <MenuItem value="mindbody">Mind/Body</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={8}>
+          <TextField
+            fullWidth
+            label="Exercise Name"
+            value={exerciseName}
+            onChange={handleExerciseNameChange}
+            placeholder="e.g., Bench Press"
+          />
+        </Grid>
+      </Grid>
 
-      <input
-        type="number"
-        value={weight === 0 ? "" : weight} // if 0 show nothing
-        onChange={handleWeightChange}
-        placeholder="Weight (lbs)"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
-      
-      </>
+      {exerciseType === 'strength' && (
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Sets"
+              type="number"
+              value={sets === 0 ? '' : sets}
+              onChange={(e) => setSets(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Reps"
+              type="number"
+              value={reps === 0 ? '' : reps}
+              onChange={(e) => setReps(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Weight (lbs)"
+              type="number"
+              value={weight === 0 ? '' : weight}
+              onChange={(e) => setWeight(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+        </Grid>
       )}
 
-      {exerciseType === "cardio" && (
-      <>
-      <input
-        type="number"
-        value={distance === 0 ? "" : distance}
-        onChange={handleDistanceChange}
-        placeholder="Distance (miles)"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
-      
-      <input
-        type="number"
-        value={duration === 0 ? "": duration}
-        onChange={handleDurationChange}
-        placeholder="Duration (minutes)"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
-       
-      <input
-        type="number"
-        value={speed === 0 ? "" : speed}
-        onChange={handleSpeedChange}
-        placeholder="Speed (mph)"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
-
-      </>
+      {exerciseType === 'cardio' && (
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Distance (miles)"
+              type="number"
+              value={distance === 0 ? '' : distance}
+              onChange={(e) => setDistance(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Duration (min)"
+              type="number"
+              value={duration === 0 ? '' : duration}
+              onChange={(e) => setDuration(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              fullWidth
+              label="Speed (mph)"
+              type="number"
+              value={speed === 0 ? '' : speed}
+              onChange={(e) => setSpeed(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+        </Grid>
       )}
 
-      {exerciseType === "mindbody" && (
-      <>
-      <input
-        type="number"
-        value={duration === 0 ? "" : duration}
-        onChange={handleDurationChange}
-        placeholder="Duration (minutes)"
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
-        min="0"
-      />
+      {exerciseType === 'mindbody' && (
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <TextField
+              fullWidth
+              label="Duration (min)"
+              type="number"
+              value={duration === 0 ? '' : duration}
+              onChange={(e) => setDuration(e.target.value === '' ? 0 : Number(e.target.value))}
+              placeholder="0"
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl fullWidth>
+              <InputLabel>Intensity</InputLabel>
+              <Select
+                value={intensity}
+                onChange={(e) => setIntensity(e.target.value)}
+                label="Intensity"
+              >
+                <MenuItem value="n/a">Optional</MenuItem>
+                <MenuItem value="Light">Light</MenuItem>
+                <MenuItem value="Moderate">Moderate</MenuItem>
+                <MenuItem value="High">High</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      )}
 
-
-      <select
-        id="intensity" aria-label="Intensity (Optional)" onChange={(e) => setIntensity(e.target.value)}
-        style={{ width: '70%', padding: '8px', marginBottom: '10px' }}
+      <Button
+        variant="outlined"
+        onClick={handleAddExercise}
+        startIcon={<AddIcon />}
+        disabled={!exerciseName.trim()}
+        sx={{ mb: 3 }}
+        fullWidth
       >
-        <option value="n/a">Intensity (Optional)</option>
-        <option value="Light">Light</option>
-        <option value="Moderate">Moderate</option>
-        <option value="High">High</option>
-      </select>
-      <br></br>
-      </>
-      )}
-
-      <button onClick={addExercise} style={{ padding: '8px 16px', marginLeft: '0px' }}>
         Add Exercise
-      </button>
+      </Button>
 
-      <ul>
-        {currentExercises.map((exercise, index) => (
-          <li key={index}>
-
-            {exercise.name}
-            <br/>
-
-            {(() => {
-              if (exercise.exerciseType === "strength") {
-                const details = [];
+      {currentExercises.length > 0 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Added Exercises ({currentExercises.length})
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {currentExercises.map((exercise, index) => {
+              let details: string[] = [];
+              if (exercise.exerciseType === 'strength') {
                 if (exercise.sets && exercise.sets > 0) details.push(`${exercise.sets} sets`);
                 if (exercise.reps && exercise.reps > 0) details.push(`${exercise.reps} reps`);
                 if (exercise.weight && exercise.weight > 0) details.push(`${exercise.weight} lbs`);
-                return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details
               } else if (exercise.exerciseType === 'cardio') {
-                const details = [];
                 if (exercise.distance && exercise.distance > 0) details.push(`${exercise.distance} mi`);
                 if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
                 if (exercise.speed && exercise.speed > 0) details.push(`${exercise.speed} mph`);
-                return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details      
               } else if (exercise.exerciseType === 'mindbody') {
-                const details = [];
                 if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
                 if (exercise.intensity && exercise.intensity !== 'n/a') details.push(`${exercise.intensity} intensity`);
-                return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details
               }
-            })()}
 
-            <button onClick={() => deleteExercise(index)} style={{padding: '1px 7px', marginLeft: '10px'}}>
-               Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div>
-        {(!workoutName.trim() || currentExercises.length === 0) && (
-          <p style={{ color: 'gray' }}>
-            {workoutName.trim() === '' && currentExercises.length === 0
-              ? 'Please name the workout and add at least one exercise to enable the "Add Workout" button.'
-              : workoutName.trim() === ''
-              ? 'Please name the workout to enable the "Add Workout" button.'
-              : 'Please add at least one exercise to enable the "Add Workout" button.'}
-          </p>
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    p: 2,
+                    border: `2px solid ${getTypeColor(exercise.exerciseType)}`,
+                    borderRadius: 2,
+                    backgroundColor: `${getTypeColor(exercise.exerciseType)}15`,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Box>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {exercise.name}
+                    </Typography>
+                    {details.length > 0 && (
+                      <Typography variant="body2" sx={{ color: '#666', mt: 0.5 }}>
+                        {details.join(' • ')}
+                      </Typography>
+                    )}
+                  </Box>
+                  <IconButton
+                    onClick={() => deleteExercise(index)}
+                    size="small"
+                    sx={{ color: '#ff6b6b' }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+      )}
+
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}>
+        {onClose && (
+          <Button variant="outlined" onClick={onClose}>
+            Cancel
+          </Button>
         )}
-        {workoutName.trim() !== '' && currentExercises.length > 0 && (
-          <button
-            onClick={() => addWorkout()}
-            style={{ padding: '8px 16px', marginLeft: '0px' }}
-          >
-            Add Workout
-          </button>
-        )}
-      </div>
-    </div>
+        <Button
+          variant="contained"
+          onClick={handleAddWorkout}
+          disabled={!workoutName.trim() || currentExercises.length === 0}
+          sx={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #5568d3 0%, #654392 100%)',
+            },
+            '&:disabled': {
+              background: '#ccc',
+            },
+          }}
+        >
+          Create Workout
+        </Button>
+      </Box>
+
+      {(!workoutName.trim() || currentExercises.length === 0) && (
+        <Typography variant="body2" sx={{ color: '#999', mt: 1, textAlign: 'center' }}>
+          {workoutName.trim() === '' && currentExercises.length === 0
+            ? 'Please name the workout and add at least one exercise'
+            : workoutName.trim() === ''
+            ? 'Please name the workout'
+            : 'Please add at least one exercise'}
+        </Typography>
+      )}
+    </Box>
   );
 };
 

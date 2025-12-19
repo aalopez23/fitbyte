@@ -133,6 +133,7 @@ const WorkoutsPage: React.FC = () => {
               currentExercises={currentExercises}
               addWorkout={addWorkout}
               deleteWorkout={deleteWorkout}
+              onClose={handleCloseModal}
             />
           </Box>
         </Modal>

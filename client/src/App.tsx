@@ -25,34 +25,53 @@ const Navigation: React.FC = () => {
 
   return (
     <AppBar position="sticky" sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: 2 }}>
-      <Toolbar>
-        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'white', fontWeight: 700 }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', px: 4, gap: 4 }}>
+        <Typography 
+          variant="h6" 
+          component={Link} 
+          to="/" 
+          sx={{ 
+            textDecoration: 'none', 
+            color: 'white', 
+            fontWeight: 700,
+            minWidth: 'fit-content'
+          }}
+        >
           FitByte
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          <Button color="inherit" component={Link} to="/" sx={{ textTransform: 'none' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 4, 
+          alignItems: 'center', 
+          flex: 1, 
+          justifyContent: 'center',
+          mx: 'auto'
+        }}>
+          <Button color="inherit" component={Link} to="/" sx={{ textTransform: 'none', fontWeight: 500, px: 2 }}>
             Home
           </Button>
-          <Button color="inherit" component={Link} to="/workouts" sx={{ textTransform: 'none' }}>
+          <Button color="inherit" component={Link} to="/workouts" sx={{ textTransform: 'none', fontWeight: 500, px: 2 }}>
             Workouts
           </Button>
-          <Button color="inherit" component={Link} to="/nutrition" sx={{ textTransform: 'none' }}>
+          <Button color="inherit" component={Link} to="/nutrition" sx={{ textTransform: 'none', fontWeight: 500, px: 2 }}>
             Nutrition
           </Button>
-          <Button color="inherit" component={Link} to="/goals" sx={{ textTransform: 'none' }}>
+          <Button color="inherit" component={Link} to="/goals" sx={{ textTransform: 'none', fontWeight: 500, px: 2 }}>
             Goals
           </Button>
-          <Button color="inherit" component={Link} to="/progress" sx={{ textTransform: 'none' }}>
+          <Button color="inherit" component={Link} to="/progress" sx={{ textTransform: 'none', fontWeight: 500, px: 2 }}>
             Progress
           </Button>
-          <Typography variant="body2" sx={{ mr: 1 }}>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', minWidth: 'fit-content' }}>
+          <Typography variant="body2" sx={{ color: 'white', fontWeight: 500, whiteSpace: 'nowrap' }}>
             {user?.email?.split('@')[0] || user?.id}
           </Typography>
           <Button
             color="inherit"
             onClick={handleLogout}
             startIcon={<ExitToAppIcon />}
-            sx={{ textTransform: 'none' }}
+            sx={{ textTransform: 'none', fontWeight: 500 }}
           >
             Logout
           </Button>

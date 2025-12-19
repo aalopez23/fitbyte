@@ -78,7 +78,7 @@ export const useWorkouts = () => {
           })),
         });
         await loadWorkouts();
-        return;
+        return true;
       }
 
       if (workoutName.trim() !== '' && currentExercises.length > 0) {
@@ -99,9 +99,12 @@ export const useWorkouts = () => {
         setWorkoutName('');
         setCurrentExercises([]);
         await loadWorkouts();
+        return true;
       }
+      return false;
     } catch (error: any) {
       console.error('Error creating workout:', error);
+      return false;
     }
   };
 
