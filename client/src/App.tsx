@@ -112,7 +112,7 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/fitbyte">
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
