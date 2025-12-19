@@ -1,78 +1,102 @@
 // src/App.tsx
 import React from 'react';
 import './index.css';
-import WorkoutInput from './components/WorkoutInput';
-import WorkoutList from './components/WorkoutList';
-import { useWorkouts } from './hooks/useWorkouts';
-import GoalTracker from './components/GoalTracker'
 import WorkoutsPage from './pages/WorkoutsPage';
 import HomePage from './pages/HomePage';
-import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link, useHistory } from 'react-router-dom';
 import GoalTrackerPage from './pages/GoalTrackerPage';
+import LoginPage from './pages/LoginPage';
+import NutritionPage from './pages/NutritionPage';
+import ProgressPage from './pages/ProgressPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
+const Navigation: React.FC = () => {
+  const { isAuthenticated, signOut, user } = useAuth();
+  const history = useHistory();
 
-const App: React.FC = () => {
-  const {
-    workoutName,
-    setWorkoutName,
-    exerciseName,
-    setExerciseName,
-    exerciseType,
-    setExerciseType,
-    sets,
-    setSets,
-    weight,
-    setWeight,
-    reps,
-    setReps,
-    speed,
-    setSpeed,
-    distance,
-    setDistance,
-    duration,
-    setDuration,
-    intensity,
-    setIntensity,
-    currentExercises,
-    addExercise,
-    deleteExercise,
-    workouts,
-    addWorkout,
-    saveWorkouts,
-    deleteWorkout,
-  
-  } = useWorkouts();
+  const handleLogout = async () => {
+    await signOut();
+    history.push('/login');
+  };
+
+  if (!isAuthenticated) return null;
 
   return (
+    <AppBar position="sticky" sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: 2 }}>
+      <Toolbar>
+        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'white', fontWeight: 700 }}>
+          FitByte
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          <Button color="inherit" component={Link} to="/" sx={{ textTransform: 'none' }}>
+            Home
+          </Button>
+          <Button color="inherit" component={Link} to="/workouts" sx={{ textTransform: 'none' }}>
+            Workouts
+          </Button>
+          <Button color="inherit" component={Link} to="/nutrition" sx={{ textTransform: 'none' }}>
+            Nutrition
+          </Button>
+          <Button color="inherit" component={Link} to="/goals" sx={{ textTransform: 'none' }}>
+            Goals
+          </Button>
+          <Button color="inherit" component={Link} to="/progress" sx={{ textTransform: 'none' }}>
+            Progress
+          </Button>
+          <Typography variant="body2" sx={{ mr: 1 }}>
+            {user?.email?.split('@')[0] || user?.id}
+          </Typography>
+          <Button
+            color="inherit"
+            onClick={handleLogout}
+            startIcon={<ExitToAppIcon />}
+            sx={{ textTransform: 'none' }}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+const AppRoutes: React.FC = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <Typography>Loading...</Typography>
+    </Box>;
+  }
+
+  return (
+    <>
+      <Navigation />
+      <Switch>
+        <Route exact path="/login" component={LoginPage} />
+        {!isAuthenticated && <Route path="*" component={LoginPage} />}
+        {isAuthenticated && (
+          <>
+            <Route exact path="/" component={HomePage} />
+            <Route exact path="/workouts" component={WorkoutsPage} />
+            <Route exact path="/nutrition" component={NutritionPage} />
+            <Route exact path="/goals" component={GoalTrackerPage} />
+            <Route exact path="/progress" component={ProgressPage} />
+          </>
+        )}
+      </Switch>
+    </>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <BrowserRouter>
-      <div>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light" style={{ position: 'sticky', top: 0, zIndex: 1000}}>
-          <a className="navbar-brand mb-0 h1">FitByte</a>
-          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/">Home</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/Workouts">Workouts</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/GoalTracker">Goals</Link>
-              </li>
-            </ul>
-          </div>
-        </nav>
-
-        <Switch>
-          <Route exact path="/" component={HomePage} />
-          <Route exact path="/Workouts" component={WorkoutsPage} />
-          <Route exact path="/GoalTracker" component={GoalTrackerPage} />
-        </Switch>
-      </div>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 };

@@ -1,5 +1,10 @@
 import React from 'react';
 import { Workout } from '../types/types';
+import { Box, Typography, Card, CardContent, IconButton, Chip, Grid, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 
 interface WorkoutListProps {
   workouts: Workout[];
@@ -33,115 +38,207 @@ const suggestedWorkouts: Workout[] = [
   },
 ];
 
+const getTypeIcon = (type: string) => {
+  switch (type) {
+    case 'strength':
+      return <FitnessCenterIcon sx={{ fontSize: 20 }} />;
+    case 'cardio':
+      return <DirectionsRunIcon sx={{ fontSize: 20 }} />;
+    case 'mindbody':
+      return <SelfImprovementIcon sx={{ fontSize: 20 }} />;
+    default:
+      return null;
+  }
+};
 
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case 'strength':
+      return '#ff6b6b';
+    case 'cardio':
+      return '#4ecdc4';
+    case 'mindbody':
+      return '#95e1d3';
+    default:
+      return '#95a5a6';
+  }
+};
 
 const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, deleteWorkout, addWorkout }) => (
-  <div>
-    <h2>Workout List</h2>
+  <Box>
     {workouts.length === 0 ? (
-      <>
-        <p style={{ color: '#888', fontStyle: 'italic', textAlign: 'center' }}>
+      <Box sx={{ textAlign: 'center', py: 6 }}>
+        <Typography variant="h5" sx={{ color: '#888', mb: 4, fontWeight: 400 }}>
           No workouts created yet. Click "Create Workout" or choose a suggested workout below to get started!
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px' }}>
+        </Typography>
+        <Grid container spacing={3} justifyContent="center">
           {suggestedWorkouts.map((workout, index) => (
-            <div
-              key={index}
-              style={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                padding: '10px',
-                textAlign: 'center',
-                width: '200px',
-              }}
-            >
-              <h4>{workout.name}</h4>
-              <ul style={{ listStyleType: 'none', padding: 0 }}>
-                {workout.exercises.map((exercise, idx) => (
-                  <li key={idx} style={{ fontSize: '0.9rem', color: '#555' }}>
-                    {exercise.name}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => addWorkout(workout)}
-                style={{
-                  marginTop: '10px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '5px 10px',
-                  cursor: 'pointer',
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4,
+                  },
+                  border: '1px solid #e0e0e0',
                 }}
               >
-                + Add Workout
-              </button>
-            </div>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                    {workout.name}
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    {workout.exercises.map((exercise, idx) => (
+                      <Chip
+                        key={idx}
+                        label={exercise.name}
+                        size="small"
+                        sx={{
+                          mr: 0.5,
+                          mb: 0.5,
+                          backgroundColor: getTypeColor(exercise.exerciseType),
+                          color: 'white',
+                          fontWeight: 500,
+                        }}
+                      />
+                    ))}
+                  </Box>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => addWorkout(workout)}
+                    sx={{
+                      mt: 'auto',
+                      backgroundColor: '#667eea',
+                      '&:hover': {
+                        backgroundColor: '#5568d3',
+                      },
+                      textTransform: 'none',
+                    }}
+                  >
+                    Add Workout
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </div>
-      </>
+        </Grid>
+      </Box>
     ) : (
-      workouts.map((workout, index) => (
-        <div key={index} className="workout-box">
-          <div className="workout-header">
-            <h3>{workout.name}</h3>
-            <button className="delete-button" onClick={() => deleteWorkout(index)}>
-              x
-            </button>
-          </div>
+      <Grid container spacing={3}>
+        {workouts.map((workout, index) => (
+          <Grid item xs={12} key={index}>
+            <Card
+              sx={{
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: 4,
+                },
+                border: '1px solid #e0e0e0',
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 600, color: '#333' }}>
+                    {workout.name}
+                  </Typography>
+                  <IconButton
+                    onClick={() => deleteWorkout(index)}
+                    sx={{
+                      color: '#ff6b6b',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                      },
+                    }}
+                    size="small"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
 
-          {/* Grouped Exercises */}
-          {['strength', 'cardio', 'mindbody'].map((type) => {
-            const filteredExercises = workout?.exercises?.filter(
-              (exercise) => exercise.exerciseType === type
-            ) || [];
-            if (filteredExercises.length === 0) return null;
+                {/* Grouped Exercises */}
+                {['strength', 'cardio', 'mindbody'].map((type) => {
+                  const filteredExercises = workout?.exercises?.filter(
+                    (exercise) => exercise.exerciseType === type
+                  ) || [];
+                  if (filteredExercises.length === 0) return null;
 
-            return (
-              <div key={type}>
-                <h4>
-                  {type === 'strength'
-                    ? 'Strength Training'
-                    : type === 'cardio'
-                    ? 'Cardio'
-                    : 'Mind/Body'}
-                </h4>
-                <ul>
-                  {filteredExercises.map((exercise, idx) => (
-                    <li key={idx}>
-                      {exercise.name}
-                      <br />
-                      {(() => {
-                      if (type === 'strength') {
-                        const details = [];
-                        if (exercise.sets && exercise.sets > 0) details.push(`${exercise.sets} sets`);
-                        if (exercise.reps && exercise.reps > 0) details.push(`${exercise.reps} reps`);
-                        if (exercise.weight && exercise.weight > 0) details.push(`${exercise.weight} lbs`);
-                        return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details
-                      } else if (type === 'cardio') {
-                        const details = [];
-                        if (exercise.distance && exercise.distance > 0) details.push(`${exercise.distance} mi`);
-                        if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
-                        if (exercise.speed && exercise.speed > 0) details.push(`${exercise.speed} mph`);
-                        return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details
-                      } else if (type === 'mindbody') {
-                        const details = [];
-                        if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
-                        if (exercise.intensity && exercise.intensity !== 'n/a') details.push(`${exercise.intensity} intensity`);
-                        return details.length > 0 ? details.join(', ') : null; // Only render if there are valid details
-                      }
-                    })()}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-      ))
+                  const typeLabels: { [key: string]: string } = {
+                    strength: 'Strength Training',
+                    cardio: 'Cardio',
+                    mindbody: 'Mind/Body',
+                  };
+
+                  return (
+                    <Box key={type} sx={{ mb: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                        {getTypeIcon(type)}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            ml: 1,
+                            fontWeight: 600,
+                            color: getTypeColor(type),
+                            fontSize: '1.1rem',
+                          }}
+                        >
+                          {typeLabels[type]}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ pl: 4 }}>
+                        {filteredExercises.map((exercise, idx) => {
+                          let details: string[] = [];
+                          if (type === 'strength') {
+                            if (exercise.sets && exercise.sets > 0) details.push(`${exercise.sets} sets`);
+                            if (exercise.reps && exercise.reps > 0) details.push(`${exercise.reps} reps`);
+                            if (exercise.weight && exercise.weight > 0) details.push(`${exercise.weight} lbs`);
+                          } else if (type === 'cardio') {
+                            if (exercise.distance && exercise.distance > 0) details.push(`${exercise.distance} mi`);
+                            if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
+                            if (exercise.speed && exercise.speed > 0) details.push(`${exercise.speed} mph`);
+                          } else if (type === 'mindbody') {
+                            if (exercise.duration && exercise.duration > 0) details.push(`${exercise.duration} min`);
+                            if (exercise.intensity && exercise.intensity !== 'n/a') details.push(`${exercise.intensity} intensity`);
+                          }
+
+                          return (
+                            <Box
+                              key={idx}
+                              sx={{
+                                mb: 1.5,
+                                p: 1.5,
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: 2,
+                                borderLeft: `3px solid ${getTypeColor(type)}`,
+                              }}
+                            >
+                              <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                {exercise.name}
+                              </Typography>
+                              {details.length > 0 && (
+                                <Typography variant="body2" sx={{ color: '#666', fontSize: '0.9rem' }}>
+                                  {details.join(' • ')}
+                                </Typography>
+                              )}
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
     )}
-  </div>
+  </Box>
 );
 
 export default WorkoutList;

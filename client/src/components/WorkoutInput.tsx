@@ -63,9 +63,6 @@ const WorkoutInput: React.FC<WorkoutInputProps> = ({
     setExerciseName(e.target.value);
   };
 
-  const handleSetsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSets(Number(e.target.value));
-  };
 
   const handleRepsChange = (e: ChangeEvent<HTMLInputElement>) => {
     setReps(Number(e.target.value));
