@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/fitbyte/static/css/main.acd9a192.css",
+    "main.js": "/fitbyte/static/js/main.b76bae26.js",
+    "static/js/453.258b012d.chunk.js": "/fitbyte/static/js/453.258b012d.chunk.js",
+    "index.html": "/fitbyte/index.html",
+    "main.acd9a192.css.map": "/fitbyte/static/css/main.acd9a192.css.map",
+    "main.b76bae26.js.map": "/fitbyte/static/js/main.b76bae26.js.map",
+    "453.258b012d.chunk.js.map": "/fitbyte/static/js/453.258b012d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.acd9a192.css",
+    "static/js/main.b76bae26.js"
+  ]
+}
